@@ -26,11 +26,17 @@ namespace microsatellite_finder
 
             foreach (var transcript in mc.Transcripts)
             {
-                Console.Out.WriteLine($"Transcript name: {transcript.Name}");
-                Console.Out.WriteLine($"Microsatellites:");
-                foreach (var transcriptPosition in transcript.Positions.OrderByDescending(p => p.MerLen))
+                if (transcript.Positions.Length > 0)
                 {
-                    Console.Out.WriteLine($"Start: {transcriptPosition.Start} End: {transcriptPosition.End} MerLen: {transcriptPosition.MerLen}");
+                    Console.Out.WriteLine($"Transcript name: {transcript.Name}");
+                    Console.Out.WriteLine($"Microsatellites:");
+                    foreach (var transcriptPosition in transcript.Positions.OrderByDescending(p => p.MerLen))
+                    {
+                        Console.Out.WriteLine(
+                            $"Start: {transcriptPosition.Start} End: {transcriptPosition.End} MerLen: {transcriptPosition.MerLen}");
+                    }
+
+                    Console.Out.WriteLine(transcript.ToString());
                 }
             }
         }

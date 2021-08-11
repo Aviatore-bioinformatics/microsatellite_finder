@@ -47,11 +47,17 @@ namespace microsatellite_finder.Services
                             .Equals(transcript.Sequence.Substring(firstMerStart, repeatedSequenceLength)))
                         {
                             repeatCount++;
+                            //Console.Out.WriteLine($"ok {transcript.Sequence.Substring(indexStart, repeatedSequenceLength)} ::: {transcript.Sequence.Substring(firstMerStart, repeatedSequenceLength)}");
                         }
                         else
                         {
+                            //Console.Out.WriteLine($"fail {transcript.Sequence.Substring(indexStart, repeatedSequenceLength)} ::: {transcript.Sequence.Substring(firstMerStart, repeatedSequenceLength)}");
+                            /*if (repeatCount > 0)
+                            {
+                                Console.Out.WriteLine($"count: {repeatCount} ::: {firstMerStart} ::: {indexStart}");
+                            }*/
                             //Console.Out.WriteLine(repeatCount);
-                            if (repeatCount >= Options.MinRepeatNumber - 1)
+                            if (repeatCount >= Options.MinRepeatNumber)
                             {
                                 //Console.Out.WriteLine(repeatCount);
                                 var position = new Position()
@@ -65,6 +71,8 @@ namespace microsatellite_finder.Services
                             repeatCount = 0;
 
                             firstMerStart = indexStart;
+                            
+                            indexStart -= repeatedSequenceLength;
                         }
 
                         indexStart += repeatedSequenceLength;
@@ -73,6 +81,7 @@ namespace microsatellite_finder.Services
                 }
             }
 
+            //var pos = positions.OrderBy(p => p.MerLen).ThenBy(p => p.Start).ToList();
             var pos = positions.OrderBy(p => p.Start).ToList();
             for (int i = pos.Count() - 1; i >= 1; i--)
             {
