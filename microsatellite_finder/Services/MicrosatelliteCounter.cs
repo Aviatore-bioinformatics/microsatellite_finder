@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using microsatellite_finder.Models;
 
 namespace microsatellite_finder.Services
@@ -71,9 +72,18 @@ namespace microsatellite_finder.Services
                     }
                 }
             }
-            
 
-            return positions;
+            var pos = positions.OrderBy(p => p.Start).ToList();
+            for (int i = pos.Count() - 1; i >= 1; i--)
+            {
+                if (pos[i].Start < pos[i - 1].End && pos[i - 1].Start < pos[i].End)
+                {
+                    pos.RemoveAt(i);
+                }
+            }
+
+            return pos;
+            //return positions;
         }
     }
 }
