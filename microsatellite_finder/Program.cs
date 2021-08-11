@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using microsatellite_finder.Models;
 using microsatellite_finder.Services;
 
@@ -10,7 +11,7 @@ namespace microsatellite_finder
         {
             Console.WriteLine("Hello World!");
 
-            var fr = new FastaReader("Data/Trinity.fasta");
+            var fr = new FastaReader("Data/Trinity2.fasta");
             fr.ReadFasta();
 
             var mco = new MicrosatelliteCounterOptions()
@@ -21,12 +22,16 @@ namespace microsatellite_finder
                 MaxRepeatNumber = 10
             };
             var mc = new MicrosatelliteCounter(mco, fr.Transcripts);
-            var result = mc.ScanSequence(fr.Transcripts[0], mco);
+            mc.FindMicrosatellites();
 
-            Console.Out.WriteLine($"Microsatellites Count: {result.Count}");
-            foreach (var position in result)
+            foreach (var transcript in mc.Transcripts)
             {
-                Console.Out.WriteLine($"start: {position.Start} stop: {position.End}");
+                Console.Out.WriteLine($"Transcript name: {transcript.Name}");
+                Console.Out.WriteLine($"Microsatellites:");
+                foreach (var transcriptPosition in transcript.Positions.OrderByDescending(p => p.MerLen))
+                {
+                    Console.Out.WriteLine($"Start: {transcriptPosition.Start} End: {transcriptPosition.End} MerLen: {transcriptPosition.MerLen}");
+                }
             }
         }
     }

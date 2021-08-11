@@ -4,5 +4,6 @@ namespace microsatellite_finder.Models
     {
         public int Start { get; set; }
         public int End { get; set; }
+        public int MerLen { get; set; }
     }
 }

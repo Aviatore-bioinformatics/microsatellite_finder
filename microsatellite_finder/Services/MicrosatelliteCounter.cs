@@ -15,53 +15,63 @@ namespace microsatellite_finder.Services
             Transcripts = transcripts;
         }
 
-        public void FindMicrosatellites(Transcript transcript)
+        public void FindMicrosatellites()
         {
-            
+            foreach (var transcript in Transcripts)
+            {
+                transcript.Positions = ScanSequence(transcript).ToArray();
+            }
         }
 
-        public List<Position> ScanSequence(Transcript transcript, MicrosatelliteCounterOptions options)
+        public List<Position> ScanSequence(Transcript transcript)
         {
             List<Position> positions = new List<Position>();
-            
-            for (int i = 0; i < 3; i++)
+
+            for (int repeatedSequenceLength = Options.MinRepeatedSequenceLength;
+                repeatedSequenceLength < Options.MaxRepeatedSequenceLength;
+                repeatedSequenceLength++)
             {
-                int repeatedSequenceLength = options.MinRepeatedSequenceLength; 
-                int indexStart = i;
-                int indexEnd = indexStart + repeatedSequenceLength;
-                int firstMerStart = i;
-
-                int repeatCount = 0;
-                
-                while (transcript.Sequence.Length >= indexEnd)
+                for (int i = 0; i < 3; i++)
                 {
-                    if (transcript.Sequence.Substring(indexStart, repeatedSequenceLength)
-                        .Equals(transcript.Sequence.Substring(firstMerStart, repeatedSequenceLength)))
+                    //int repeatedSequenceLength = options.MinRepeatedSequenceLength; 
+                    int indexStart = i;
+                    int indexEnd = indexStart + repeatedSequenceLength;
+                    int firstMerStart = i;
+
+                    int repeatCount = 0;
+                
+                    while (transcript.Sequence.Length >= indexEnd)
                     {
-                        repeatCount++;
-                    }
-                    else
-                    {
-                        //Console.Out.WriteLine(repeatCount);
-                        if (repeatCount >= options.MinRepeatNumber - 1)
+                        if (transcript.Sequence.Substring(indexStart, repeatedSequenceLength)
+                            .Equals(transcript.Sequence.Substring(firstMerStart, repeatedSequenceLength)))
                         {
-                            Console.Out.WriteLine(repeatCount);
-                            var position = new Position()
-                            {
-                                Start = firstMerStart,
-                                End = indexStart - 1
-                            };
-                            positions.Add(position);
+                            repeatCount++;
                         }
-                        repeatCount = 0;
+                        else
+                        {
+                            //Console.Out.WriteLine(repeatCount);
+                            if (repeatCount >= Options.MinRepeatNumber - 1)
+                            {
+                                //Console.Out.WriteLine(repeatCount);
+                                var position = new Position()
+                                {
+                                    Start = firstMerStart,
+                                    End = indexStart - 1,
+                                    MerLen = repeatedSequenceLength
+                                };
+                                positions.Add(position);
+                            }
+                            repeatCount = 0;
 
-                        firstMerStart = indexStart;
+                            firstMerStart = indexStart;
+                        }
+
+                        indexStart += repeatedSequenceLength;
+                        indexEnd = indexStart + repeatedSequenceLength;
                     }
-
-                    indexStart += repeatedSequenceLength;
-                    indexEnd = indexStart + repeatedSequenceLength;
                 }
             }
+            
 
             return positions;
         }
