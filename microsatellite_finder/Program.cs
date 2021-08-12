@@ -43,7 +43,7 @@ namespace microsatellite_finder
             {
                 MinRepeatedSequenceLength = 3,
                 MaxRepeatedSequenceLength = 10,
-                MinRepeatNumber = 6,
+                MinRepeatNumber = 3,
                 MaxRepeatNumber = 3 // not used yet
             };
             var mc = new MicrosatelliteCounter(mco, fr.Transcripts, logger);
@@ -51,7 +51,7 @@ namespace microsatellite_finder
 
             using (var sw = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), commandLineOptions.Value.OutputFileName)))
             {
-                foreach (var transcript in mc.Transcripts)
+                foreach (var transcript in mc.Transcripts.Where(p => p.Positions.Any()).OrderByDescending(p => p.Positions.OrderByDescending(pp => pp.MerLen).First().MerLen))
                 {
                     if (transcript.Positions.Length > 0)
                     {
