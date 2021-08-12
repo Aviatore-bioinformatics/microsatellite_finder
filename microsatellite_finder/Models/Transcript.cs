@@ -49,6 +49,31 @@ namespace microsatellite_finder.Models
 
             output.Append(Sequence.Substring(start));
 
+            return FastaFormatter(output.ToString());
+        }
+
+        public string FastaFormatter(string input)
+        {
+            StringBuilder output = new StringBuilder();
+
+            var inputSplitted = input.Split('\n');
+            output.Append(inputSplitted[0] + '\n');
+
+            int indexStart = 0;
+            int lineLength = 60;
+
+            while (inputSplitted[1].Length >= indexStart + lineLength)
+            {
+                output.Append(inputSplitted[1].Substring(indexStart, lineLength) + '\n');
+
+                indexStart += lineLength;
+            }
+
+            if (inputSplitted[1].Length > indexStart)
+            {
+                output.Append(inputSplitted[1].Substring(indexStart) + '\n');
+            }
+
             return output.ToString();
         }
     }
