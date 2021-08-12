@@ -3,6 +3,9 @@ using System.IO;
 using System.Linq;
 using microsatellite_finder.Models;
 using microsatellite_finder.Services;
+using Microsoft.Extensions.Configuration;
+using Serilog;
+using Serilog.Configuration;
 
 namespace microsatellite_finder
 {
@@ -11,6 +14,15 @@ namespace microsatellite_finder
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            var logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
 
             var fr = new FastaReader("Data/Trinity.fasta");
             fr.ReadFasta();
