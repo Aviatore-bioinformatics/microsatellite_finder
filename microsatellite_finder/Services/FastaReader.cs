@@ -10,6 +10,7 @@ namespace microsatellite_finder.Services
     {
         public List<Transcript> Transcripts { get; }
         public string FastaFilePath { get; }
+        public int transcriptCount;
 
         public FastaReader(string filePath)
         {
@@ -29,6 +30,7 @@ namespace microsatellite_finder.Services
                 {
                     if (line.StartsWith('>'))
                     {
+                        transcriptCount++;
                         if (sequenceTmp.Length > 0)
                         {
                             var transcript = new Transcript()

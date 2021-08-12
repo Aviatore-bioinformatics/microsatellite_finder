@@ -16,10 +16,14 @@ namespace microsatellite_finder.Services
             Transcripts = transcripts;
         }
 
-        public void FindMicrosatellites()
+        public void FindMicrosatellites(int transcriptCount)
         {
+            int count = 0;
             foreach (var transcript in Transcripts)
             {
+                count++;
+                Console.Clear();
+                Console.Out.WriteLine($"Transcript: {count}/{transcriptCount}");
                 transcript.Positions = ScanSequence(transcript).ToArray();
             }
         }
@@ -47,11 +51,11 @@ namespace microsatellite_finder.Services
                             .Equals(transcript.Sequence.Substring(firstMerStart, repeatedSequenceLength)))
                         {
                             repeatCount++;
-                            //Console.Out.WriteLine($"ok {transcript.Sequence.Substring(indexStart, repeatedSequenceLength)} ::: {transcript.Sequence.Substring(firstMerStart, repeatedSequenceLength)}");
+                            //Console.Out.WriteLine($"ok {indexStart} ::: {repeatedSequenceLength} ::: {repeatCount} ::: {firstMerStart} ::: {indexStart - 1} {transcript.Sequence.Substring(indexStart, repeatedSequenceLength)} ::: {transcript.Sequence.Substring(firstMerStart, repeatedSequenceLength)}");
                         }
                         else
                         {
-                            //Console.Out.WriteLine($"fail {transcript.Sequence.Substring(indexStart, repeatedSequenceLength)} ::: {transcript.Sequence.Substring(firstMerStart, repeatedSequenceLength)}");
+                            //Console.Out.WriteLine($"fail {indexStart} ::: {repeatedSequenceLength} ::: {repeatCount} ::: {firstMerStart} ::: {indexStart - 1} {transcript.Sequence.Substring(indexStart, repeatedSequenceLength)} ::: {transcript.Sequence.Substring(firstMerStart, repeatedSequenceLength)}");
                             /*if (repeatCount > 0)
                             {
                                 Console.Out.WriteLine($"count: {repeatCount} ::: {firstMerStart} ::: {indexStart}");
@@ -66,6 +70,7 @@ namespace microsatellite_finder.Services
                                     End = indexStart - 1,
                                     MerLen = repeatedSequenceLength
                                 };
+                                //Console.Out.WriteLine($"Added: {position.Start} <> {position.End} <> {position.MerLen}");
                                 positions.Add(position);
                             }
                             repeatCount = 0;
@@ -78,6 +83,19 @@ namespace microsatellite_finder.Services
                         indexStart += repeatedSequenceLength;
                         indexEnd = indexStart + repeatedSequenceLength;
                     }
+                    
+                    if (repeatCount >= Options.MinRepeatNumber)
+                    {
+                        //Console.Out.WriteLine(repeatCount);
+                        var position = new Position()
+                        {
+                            Start = firstMerStart,
+                            End = indexStart - 1,
+                            MerLen = repeatedSequenceLength
+                        };
+                        //Console.Out.WriteLine($"Added: {position.Start} <> {position.End} <> {position.MerLen}");
+                        positions.Add(position);
+                    }
                 }
             }
 
@@ -85,14 +103,15 @@ namespace microsatellite_finder.Services
             var pos = positions.OrderBy(p => p.Start).ToList();
             for (int i = pos.Count() - 1; i >= 1; i--)
             {
-                if (pos[i].Start < pos[i - 1].End && pos[i - 1].Start < pos[i].End)
+                if (pos[i].Start + 1 < pos[i - 1].End && pos[i - 1].Start + 1 < pos[i].End)
                 {
                     pos.RemoveAt(i);
                 }
             }
 
             return pos;
-            //return positions;
+            /*Console.Out.WriteLine($"positions count: {positions.Count}");
+            return positions.OrderBy(p => p.Start).ToList();*/
         }
     }
 }

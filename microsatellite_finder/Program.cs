@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using microsatellite_finder.Models;
 using microsatellite_finder.Services;
@@ -11,34 +12,38 @@ namespace microsatellite_finder
         {
             Console.WriteLine("Hello World!");
 
-            var fr = new FastaReader("Data/Trinity2.fasta");
+            var fr = new FastaReader("Data/Trinity.fasta");
             fr.ReadFasta();
 
             var mco = new MicrosatelliteCounterOptions()
             {
                 MinRepeatedSequenceLength = 3,
                 MaxRepeatedSequenceLength = 10,
-                MinRepeatNumber = 3,
-                MaxRepeatNumber = 10
+                MinRepeatNumber = 6,
+                MaxRepeatNumber = 3 // not used yet
             };
             var mc = new MicrosatelliteCounter(mco, fr.Transcripts);
-            mc.FindMicrosatellites();
+            mc.FindMicrosatellites(fr.transcriptCount);
 
-            foreach (var transcript in mc.Transcripts)
+            using (var sw = new StreamWriter("Data/output.fasta"))
             {
-                if (transcript.Positions.Length > 0)
+                foreach (var transcript in mc.Transcripts)
                 {
-                    Console.Out.WriteLine($"Transcript name: {transcript.Name}");
-                    Console.Out.WriteLine($"Microsatellites:");
-                    foreach (var transcriptPosition in transcript.Positions.OrderByDescending(p => p.MerLen))
+                    if (transcript.Positions.Length > 0)
                     {
-                        Console.Out.WriteLine(
-                            $"Start: {transcriptPosition.Start} End: {transcriptPosition.End} MerLen: {transcriptPosition.MerLen}");
-                    }
+                        /*Console.Out.WriteLine($"Transcript name: {transcript.Name}");
+                        Console.Out.WriteLine($"Microsatellites:");
+                        foreach (var transcriptPosition in transcript.Positions.OrderByDescending(p => p.MerLen))
+                        {
+                            Console.Out.WriteLine(
+                                $"Start: {transcriptPosition.Start} End: {transcriptPosition.End} MerLen: {transcriptPosition.MerLen}");
+                        }*/
 
-                    Console.Out.WriteLine(transcript.ToString());
+                        sw.Write(transcript.ToString() + '\n');
+                    }
                 }
             }
+            
         }
     }
 }
