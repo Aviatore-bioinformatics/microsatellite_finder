@@ -23,8 +23,20 @@ namespace microsatellite_finder
             var logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
+            
+            var commandLineOptions = CommandLine.Parser.Default.ParseArguments<CommandLineOptions>(args);
+            if (commandLineOptions.Errors.Any())
+            {
+                return;
+            }
 
-            var fr = new FastaReader("Data/Trinity.fasta");
+            if (!commandLineOptions.Value.CheckOptions())
+            {
+                logger.Error($"The file {commandLineOptions.Value.FastaFileName} does not exists");
+                return;
+            }
+
+            var fr = new FastaReader(Path.Combine(Directory.GetCurrentDirectory(), commandLineOptions.Value.FastaFileName));
             fr.ReadFasta();
 
             var mco = new MicrosatelliteCounterOptions()
@@ -34,10 +46,10 @@ namespace microsatellite_finder
                 MinRepeatNumber = 6,
                 MaxRepeatNumber = 3 // not used yet
             };
-            var mc = new MicrosatelliteCounter(mco, fr.Transcripts);
+            var mc = new MicrosatelliteCounter(mco, fr.Transcripts, logger);
             mc.FindMicrosatellites(fr.transcriptCount);
 
-            using (var sw = new StreamWriter("Data/output.fasta"))
+            using (var sw = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), commandLineOptions.Value.OutputFileName)))
             {
                 foreach (var transcript in mc.Transcripts)
                 {

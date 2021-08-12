@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using microsatellite_finder.Models;
+using Serilog.Core;
 
 namespace microsatellite_finder.Services
 {
@@ -9,11 +10,13 @@ namespace microsatellite_finder.Services
     {
         public MicrosatelliteCounterOptions Options { get; }
         public List<Transcript> Transcripts { get; set; }
+        private Logger _logger;
         
-        public MicrosatelliteCounter(MicrosatelliteCounterOptions options, List<Transcript> transcripts)
+        public MicrosatelliteCounter(MicrosatelliteCounterOptions options, List<Transcript> transcripts, Logger logger)
         {
             Options = options;
             Transcripts = transcripts;
+            _logger = logger;
         }
 
         public void FindMicrosatellites(int transcriptCount)
@@ -22,8 +25,12 @@ namespace microsatellite_finder.Services
             foreach (var transcript in Transcripts)
             {
                 count++;
-                Console.Clear();
-                Console.Out.WriteLine($"Transcript: {count}/{transcriptCount}");
+                //Console.Clear();
+                //Console.Out.WriteLine($"Transcript: {count}/{transcriptCount}");
+                if (count % 1000 == 0)
+                {
+                    _logger.Debug($"Transcript: {count}/{transcriptCount}");
+                }
                 transcript.Positions = ScanSequence(transcript).ToArray();
             }
         }
