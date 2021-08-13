@@ -6,7 +6,7 @@ namespace microsatellite_finder.Models
 {
     public class Transcript
     {
-        private int lineLen = 60;
+        public int LineLen { get; set; }
         public string Name { get; set; }
         public string Sequence { get; set; }
         public Position[] Positions { get; set; }
@@ -60,13 +60,12 @@ namespace microsatellite_finder.Models
             output.Append(inputSplitted[0] + '\n');
 
             int indexStart = 0;
-            int lineLength = 60;
 
-            while (inputSplitted[1].Length >= indexStart + lineLength)
+            while (inputSplitted[1].Length >= indexStart + LineLen)
             {
-                output.Append(inputSplitted[1].Substring(indexStart, lineLength) + '\n');
+                output.Append(inputSplitted[1].Substring(indexStart, LineLen) + '\n');
 
-                indexStart += lineLength;
+                indexStart += LineLen;
             }
 
             if (inputSplitted[1].Length > indexStart)

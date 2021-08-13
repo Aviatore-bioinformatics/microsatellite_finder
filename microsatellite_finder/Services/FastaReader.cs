@@ -22,6 +22,7 @@ namespace microsatellite_finder.Services
         {
             var nameTmp = new StringBuilder();
             var sequenceTmp = new StringBuilder();
+            int? lineLength = null;
             
             using (var sr = new StreamReader(FastaFilePath))
             {
@@ -31,12 +32,13 @@ namespace microsatellite_finder.Services
                     if (line.StartsWith('>'))
                     {
                         transcriptCount++;
-                        if (sequenceTmp.Length > 0)
+                        if (sequenceTmp.Length > 0 && lineLength is not null)
                         {
                             var transcript = new Transcript()
                             {
                                 Name = nameTmp.ToString(),
-                                Sequence = sequenceTmp.ToString()
+                                Sequence = sequenceTmp.ToString(),
+                                LineLen = lineLength ?? default
                             };
                             
                             Transcripts.Add(transcript);
@@ -46,10 +48,12 @@ namespace microsatellite_finder.Services
                         }
                         
                         nameTmp.Append(line);
+                        lineLength = null;
                     }
                     else
                     {
                         sequenceTmp.Append(line.TrimEnd());
+                        lineLength ??= line.TrimEnd().Length;
                     }
                     
                     line = sr.ReadLine();
