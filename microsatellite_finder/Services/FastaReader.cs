@@ -62,7 +62,8 @@ namespace microsatellite_finder.Services
                 var trans = new Transcript()
                 {
                     Name = nameTmp.ToString(),
-                    Sequence = sequenceTmp.ToString()
+                    Sequence = sequenceTmp.ToString(),
+                    LineLen = lineLength ?? default
                 };
                             
                 Transcripts.Add(trans);
